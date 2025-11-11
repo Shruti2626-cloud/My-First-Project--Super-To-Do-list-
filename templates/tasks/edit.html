@@ -1,0 +1,32 @@
+
+{% extends 'layout.html' %}
+{% block content %}
+<h3 class="mb-3">{{ 'New Task' if mode=='new' else 'Edit Task' }}</h3>
+<form method="post" enctype="multipart/form-data" class="row g-3" novalidate>
+  {{ form.hidden_tag() }}
+  <div class="col-12">
+    {{ form.title.label(class="form-label") }}
+    {{ form.title(class="form-control") }}
+  </div>
+  <div class="col-12">
+    {{ form.notes.label(class="form-label") }}
+    {{ form.notes(class="form-control", rows="4") }}
+  </div>
+  <div class="col-md-4">
+    {{ form.priority.label(class="form-label") }}
+    {{ form.priority(class="form-select") }}
+  </div>
+  <div class="col-md-4">
+    {{ form.due_date.label(class="form-label") }}
+    {{ form.due_date(class="form-control", placeholder="YYYY-MM-DD") }}
+  </div>
+  <div class="col-md-4">
+    {{ form.attachment.label(class="form-label") }}
+    {{ form.attachment(class="form-control") }}
+  </div>
+  <div class="col-12">
+    {{ form.submit(class="btn btn-primary") }}
+    <a class="btn btn-secondary" href="{{ url_for('dashboard') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,77 @@
+
+{% extends 'layout.html' %}
+{% block content %}
+<h3 class="mb-3">Your Tasks</h3>
+
+<form class="row g-2 align-items-end mb-3" method="get">
+  <div class="col-sm-6 col-md-5">
+    <label class="form-label">Search</label>
+    <input class="form-control" name="q" value="{{ q }}">
+  </div>
+  <div class="col-sm-4 col-md-3">
+    <label class="form-label">Status</label>
+    <select class="form-select" name="status">
+      <option value="all" {{ 'selected' if status=='all' else '' }}>All</option>
+      <option value="open" {{ 'selected' if status=='open' else '' }}>Open</option>
+      <option value="done" {{ 'selected' if status=='done' else '' }}>Done</option>
+    </select>
+  </div>
+  <div class="col-sm-4 col-md-2">
+    <label class="form-label">Priority</label>
+    <select class="form-select" name="priority">
+      <option value="all" {{ 'selected' if priority=='all' else '' }}>All</option>
+      <option value="low" {{ 'selected' if priority=='low' else '' }}>Low</option>
+      <option value="normal" {{ 'selected' if priority=='normal' else '' }}>Normal</option>
+      <option value="high" {{ 'selected' if priority=='high' else '' }}>High</option>
+    </select>
+  </div>
+  <div class="col-sm-4 col-md-2">
+    <button class="btn btn-outline-secondary w-100" type="submit">Filter</button>
+  </div>
+</form>
+
+<div class="list-group mb-3">
+  {% for t in tasks %}
+    <div class="list-group-item d-flex justify-content-between align-items-start">
+      <div class="ms-2 me-auto">
+        <div class="fw-bold">
+          {% if t.done %}<span class="badge text-bg-success me-2">Done</span>{% endif %}
+          {{ t.title }}
+          {% if t.priority != 'normal' %}
+            <span class="badge text-bg-{{ 'danger' if t.priority=='high' else 'secondary' if t.priority=='low' else 'primary' }} ms-2">{{ t.priority }}</span>
+          {% endif %}
+        </div>
+        {% if t.notes %}<div class="small text-muted">{{ t.notes }}</div>{% endif %}
+        <div class="small">
+          {% if t.due_date %}Due: {{ t.due_date.strftime('%d %b %Y') }} • {% endif %}
+          Created: {{ t.created_at.strftime('%d %b %Y %H:%M') }}
+          {% if t.attachment %} • <a href="{{ url_for('download', filename=t.attachment) }}">Attachment</a>{% endif %}
+        </div>
+      </div>
+      <div class="btn-group btn-group-sm">
+        <a class="btn btn-outline-secondary" href="{{ url_for('task_toggle', task_id=t.id) }}">{{ 'Undone' if t.done else 'Done' }}</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('task_edit', task_id=t.id) }}">Edit</a>
+        <a class="btn btn-outline-danger" href="{{ url_for('task_delete', task_id=t.id) }}">Delete</a>
+      </div>
+    </div>
+  {% else %}
+    <div class="alert alert-info">No tasks yet. Create one!</div>
+  {% endfor %}
+</div>
+
+<nav aria-label="Pagination">
+  <ul class="pagination">
+    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+      <a class="page-link" href="?q={{ q }}&status={{ status }}&priority={{ priority }}&page={{ pagination.prev_num if pagination.has_prev else 1 }}">Prev</a>
+    </li>
+    <li class="page-item disabled"><span class="page-link">Page {{ pagination.page }} of {{ pagination.pages or 1 }}</span></li>
+    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+      <a class="page-link" href="?q={{ q }}&status={{ status }}&priority={{ priority }}&page={{ pagination.next_num if pagination.has_next else pagination.page }}">Next</a>
+    </li>
+  </ul>
+</nav>
+
+<div class="mb-3">
+  <code>/api/tasks</code> returns your tasks as JSON (when logged in).
+</div>
+{% endblock %}
